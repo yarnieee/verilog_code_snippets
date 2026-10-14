@@ -1,0 +1,18 @@
+clk freq is found by 100MHz/(9999+1) = new Hz
+recommended to name out_clk based on the new frequency of the clk.
+
+100_000_000 is current, 1s
+
+9_999 // 10kHz
+99_999 // 1kHz
+
+15_999 // 6.25kHz
+15 // 6.25Mhz
+
+24_999_999 // 0.25s or 4Hz
+49_999_999 // 0.5s or 2Hz
+199_999_999 // 2s or 0.5Hz
+399_999_999 // 4s or 0.25Hz
+499_999_999 // 5s or 0.2Hz
+1_999_999_999 // 20s
+curr max value of ctr is 4_294_967_295 which is like 40s

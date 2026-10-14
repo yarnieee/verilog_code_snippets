@@ -1,0 +1,8 @@
+16'hF800 // red
+16'h07E0 // green
+16'h001F // blue
+16'hFFFF // white
+16'h0000 // black
+16'hFFE0 // yellow
+16'hF81F // magenta
+16'h07FF // cyan
