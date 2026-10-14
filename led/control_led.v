@@ -7,12 +7,20 @@ module control_led(
     output reg [15:0] led
     );
 
-    //make slower clk
-    wire slow_clk;
-    slower_clk #(49_999_999) slower_clk_inst (clk, slow_clk);
+    wire step_tick;
+    slower_ticker #(49_999_999) led_step_ticker (
+        .clk(clk),
+        .ticker(step_tick)
+    );
 
-    reg [3:0] state = 4'b0;
-    reg [3:0] next_state = 4'b1;
+    wire [15:0] loop_led_value;
+    loop_led loop_led_inst (
+        .clk(clk),
+        .step_tick(step_tick),
+        .enable(mode == 3'd5),
+        .rst(rst),
+        .led(loop_led_value)
+    );
 
     // ======================= STATE MACHINE =========================
     always @(*) begin
@@ -25,14 +33,14 @@ module control_led(
                 led = 16'b0000_1111_1111_1111;
             end
 
+            3'd5: begin
+                led = loop_led_value;
+            end
+
             default: begin
                 led = 16'b0;
             end
         endcase
-    end
-
-    always @(posedge slow_clk) begin
-        state <= next_state;
     end
         
 endmodule
