@@ -27,7 +27,12 @@ module circle #(
 
     wire signed [8:0] dx = $signed({1'b0, x}) - CX;
     wire signed [8:0] dy = $signed({1'b0, y}) - CY;
+    wire signed [17:0] dx_wide = {{9{dx[8]}}, dx};
+    wire signed [17:0] dy_wide = {{9{dy[8]}}, dy};
+    wire signed [17:0] dx_squared = dx_wide * dx_wide;
+    wire signed [17:0] dy_squared = dy_wide * dy_wide;
+    wire signed [18:0] distance_squared = dx_squared + dy_squared;
 
-    assign inside = (dx * dx + dy * dy) <= RADIUS * RADIUS;
+    assign inside = distance_squared <= RADIUS * RADIUS;
 
 endmodule

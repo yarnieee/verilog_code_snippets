@@ -9,6 +9,24 @@ module control_oled (
 
     wire clk_6_25MHz; //
     slower_clk #(32'd7) slow_clk_inst (clk, clk_6_25MHz);
+
+    wire step_tick;
+    slower_ticker #(4_999_999) oled_step_ticker (
+        .clk(clk),
+        .ticker(step_tick)
+    );
+
+    wire [6:0] circle_x;
+    wire [5:0] circle_y;
+    loop_oled loop_oled_inst (
+        .clk(clk),
+        .step_tick(step_tick),
+        .enable(mode == 3'd4),
+        .rst(rst),
+        .circle_x(circle_x),
+        .circle_y(circle_y)
+    );
+
     wire [15:0] pixel_data;
     
     //wire rst;
@@ -20,6 +38,8 @@ module control_oled (
     oled_renderer oled_renderer_inst (
         .mode(mode),
         .pixel_index(pixel_index),
+        .circle_x(circle_x),
+        .circle_y(circle_y),
         .pixel_data(pixel_data)
     );
     
