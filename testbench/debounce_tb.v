@@ -1,22 +1,63 @@
 `timescale 1ns / 1ps
 
-module testbench_top();
+module debounce_tb;
     reg clk;
-    reg [4:0] btn;
-    reg [15:0] sw;
-    wire [15:0] led;
-    wire [3:0] an;
-    wire [7:0] seg;
-    wire [7:0] JB;
+    reg btn;
+    wire debounced;
+
+    debouncer #(.DEBOUNCE_CTR(3)) dut (
+        .clk(clk),
+        .btn(btn),
+        .debounced(debounced)
+    );
+
+    initial clk = 1'b0;
+    always #5 clk = ~clk;
+
+    task expect_debounced;
+        input expected;
+        begin
+            #1;
+            if (debounced !== expected) begin
+                $display("FAIL debounce: expected %b, got %b at %0t", expected, debounced, $time);
+                $finish;
+            end
+        end
+    endtask
 
     initial begin
-        clk = 1'b0;
+        btn = 1'b0;
+
+        repeat (2) @(posedge clk);
+        expect_debounced(1'b0);
+
+        // A press arms the debounce interval but does not toggle the output.
+        btn = 1'b1;
+        @(posedge clk);
+        expect_debounced(1'b0);
+
+        // Keep the button pressed until the counter reaches its limit.
+        repeat (4) @(posedge clk);
+        expect_debounced(1'b0);
+
+        // A stable release toggles the output once.
+        btn = 1'b0;
+        @(posedge clk);
+        expect_debounced(1'b1);
+
+        // Holding the button released must not toggle again.
+        repeat (2) @(posedge clk);
+        expect_debounced(1'b1);
+
+        // A second complete press/release toggles back once.
+        btn = 1'b1;
+        @(posedge clk);
+        repeat (4) @(posedge clk);
+        btn = 1'b0;
+        @(posedge clk);
+        expect_debounced(1'b0);
+
+        $display("PASS debounce_tb");
+        $finish;
     end
-
-    always begin
-        clk = ~clk; #5
-    end
-
-    top_module top_module_inst (clk, btn, sw, led, an, seg, JB);
-
 endmodule
