@@ -31,15 +31,6 @@ module control_led(
         endcase
     end
 
-    // ======================= OUTPUT MACHINE =========================
-    always @(*) begin
-        case(state)
-            4'd0: all_seg = ~32'b0 & (1'b0 << 20);
-            default: all_seg = ~32'b0;
-            //logic for what segment in each state, goes here
-        endcase
-    end
-
     always @(posedge slow_clk) begin
         state <= next_state;
     end

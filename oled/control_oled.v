@@ -17,13 +17,16 @@ module control_oled (
     wire sample_pixel;
     wire [12:0] pixel_index; // 0 to 6143 for a 96x64 display
 
-    // oled renderer is the REAL state controlled
-    oled_renderer oled_renderer_inst (state, pixel_index, pixel_data);
+    oled_renderer oled_renderer_inst (
+        .mode(mode),
+        .pixel_index(pixel_index),
+        .pixel_data(pixel_data)
+    );
     
     oled_display oled_display_inst (
         .clk(clk_6_25MHz), //inputs
         .reset(rst),
-        .pixel_data(oled_data),
+        .pixel_data(pixel_data),
         .frame_begin(frame_begin), //outputs
         .sending_pixels(sending_pixels),
         .sample_pixel(sample_pixel),

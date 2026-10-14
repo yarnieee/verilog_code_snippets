@@ -43,14 +43,6 @@ module oled_renderer (
         .inside(circle_1)
     );
 
-    //make slower clk
-    wire slow_clk;
-    slower_clk #(49_999_999) slower_clk_inst (clk, slow_clk);
-
-    reg [3:0] state = 4'b0;
-    reg [3:0] next_state = 4'b1;
-
-    // ======================= STATE MACHINE =========================
     always @(*) begin
         pixel_data = 16'h0000;
 
@@ -62,20 +54,13 @@ module oled_renderer (
                 if (rect_1) pixel_data = 16'h07FF; //cyan
             end
 
-            3'd1: begin
+            3'd2: begin
                 if (circle_1) pixel_data = 16'hF81F; //magenta
             end
 
             default: begin
             end
         endcase
-    end
-
-    // ======================= OUTPUT MACHINE =========================
-    // how ????
-
-    always @(posedge slow_clk) begin
-        state <= next_state;
     end
 
 endmodule

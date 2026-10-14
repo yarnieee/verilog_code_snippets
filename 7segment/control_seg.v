@@ -13,7 +13,7 @@ module control_seg(
     input [2:0] mode,
     input rst,
     output reg [3:0] an = ~4'b0,
-    output reg [7:0] seg = ~8'b0,
+    output reg [7:0] seg = ~8'b0
     );
         
     wire [1:0] active_anode;
