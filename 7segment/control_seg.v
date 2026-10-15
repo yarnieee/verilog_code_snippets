@@ -21,9 +21,6 @@ module control_seg(
         
     wire [31:0] temp_seg;
     seg_renderer seg_renderer_inst (clk, mode, temp_seg);
-    
-    //rotate temp_seg to have EE20 26__
-    // rotate_text rotate_text_inst (clk, temp_seg);
         
     always @(*) begin // TODO check whether the clock cycles line up
         case(active_anode)

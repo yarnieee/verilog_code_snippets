@@ -22,6 +22,15 @@ module oled_renderer (
     output reg [15:0] pixel_data
 );
 
+    localparam RED = 16'hF800;
+    localparam BLUE = 16'h001F;
+    localparam GREEN = 16'h07E0;
+    localparam WHITE = 16'hFFFF;
+    localparam BLACK = 16'h0000;
+    localparam YELLOW = 16'hFFE0;
+    localparam MAGENTA = 16'hF81F;
+    localparam CYAN = 16'h07FF;
+
     wire [6:0] pixel_x = pixel_index % 96;
     wire [5:0] pixel_y = pixel_index / 96;
 
@@ -57,22 +66,22 @@ module oled_renderer (
     wire moving_circle = moving_distance_squared <= 19'sd100;
 
     always @(*) begin
-        pixel_data = 16'h0000;
+        pixel_data = BLACK;
 
         // Layer priority is determined by the order of these conditions.
 	    // lowest layer first
 
         case(mode)
             3'd1: begin
-                if (rect_1) pixel_data = 16'h07FF; //cyan
+                if (rect_1) pixel_data = CYAN; //cyan
             end
 
             3'd2: begin
-                if (circle_1) pixel_data = 16'hF81F; //magenta
+                if (circle_1) pixel_data = MAGENTA; //magenta
             end
 
             3'd4: begin
-                if (moving_circle) pixel_data = 16'hF81F; //magenta
+                if (moving_circle) pixel_data = MAGENTA; //magenta
             end
 
             default: begin

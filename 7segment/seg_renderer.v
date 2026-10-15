@@ -8,6 +8,28 @@ module seg_renderer(
     output reg [31:0] all_seg = ~32'b0
     );
 
+    localparam BLANK = 8'b1111_1111;
+    localparam ZERO = 8'b1100_0000;
+    localparam ONE = 8'b1111_1001;
+    localparam TWO = 8'b1010_0100;
+    localparam THREE = 8'b1011_0000;
+    localparam FOUR = 8'b1001_1001;
+    localparam FIVE = 8'b1011_0000;
+    localparam SIX = 8'b1000_0110;
+    localparam SEVEN = 8'b1111_1000;
+    localparam EIGHT = 8'b1000_0000;
+    localparam NINE = 8'b1001_0000;
+
+    // to use these, (DOT & TOP_BAR & BOTTOM_BAR)
+    localparam DOT = 8'b0111_1111;
+    localparam TOP_BAR = 8'b1111_1110;
+    localparam MIDDLE_BAR = 8'b1011_1111;
+    localparam BOTTOM_BAR = 8'b1111_0111;
+    localparam LEFT_TOP = 8'b1101_1111;
+    localparam LEFT_BOTTOM = 8'b1110_1111;
+    localparam RIGHT_TOP = 8'b1111_1101;
+    localparam RIGHT_BOTTOM = 8'b1111_1011;
+
     wire step_tick;
     slower_ticker #(24_999_999) seg_step_ticker (
         .clk(clk),
@@ -23,6 +45,9 @@ module seg_renderer(
         .rst(1'b0),
         .all_seg(loop_seg_value)
     );
+
+    wire [31:0] rotate_text_value;
+
 
     always @(*) begin
         all_seg = ~32'b0;
