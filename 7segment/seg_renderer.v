@@ -47,14 +47,16 @@ module seg_renderer(
     );
 
     wire [31:0] rotate_text_value;
-
+    rotate_text rotate_text_inst (
+        .clk(clk),
+        .seg(rotate_text_value)
+    );
 
     always @(*) begin
         all_seg = ~32'b0;
         case(mode)
-            3'd1,
-            3'd2: begin
-                all_seg = loop_seg_value;
+            3'd0: begin
+                all_seg = rotate_text_value;
             end
 
             default: begin

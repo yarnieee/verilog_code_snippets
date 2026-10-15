@@ -1,7 +1,12 @@
 `timescale 1ns / 1ps
 
 ////////////////
-// 
+// instantiate via:
+// wire [31:0] rotate_text_value;
+// rotate_text rotate_text_inst (
+//     .clk(clk),
+//     .seg(rotate_text_value)
+// )
 ////////////////
 
 module rotate_text(

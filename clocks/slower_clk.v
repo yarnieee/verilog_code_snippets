@@ -2,6 +2,7 @@
 
 ///////////
 // instantiate via:
+// wire out_clk;
 // slower_clk #(.MAX_COUNT(9_999)) slower_clk_inst (
 //     .clk(clk),
 //     .out_clk(out_clk)
