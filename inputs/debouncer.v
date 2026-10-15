@@ -26,13 +26,16 @@ module debouncer #(
         if (btn_locked) begin
             if (ctr != DEBOUNCE_CTR) begin //not reached debounce ctr yet -> increment
                 ctr <= ctr + 1'b1;
-            end else if (!btn) begin //release btn lock
+            end else begin //release btn lock
                 btn_locked <= 1'b0;
-                debounced <= ~debounced;
             end
+            
+            if (debounced==1'b1 && !btn) debounced <= 1'b0;
+            
         end else if (btn) begin //btn pressed -> start debounce ctr;
             ctr <= 32'd0;
             btn_locked <= 1'b1;
+            debounced <= 1'b1;
         end
     end
 

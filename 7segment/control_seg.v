@@ -18,11 +18,12 @@ module control_seg(
         
     wire [1:0] active_anode;
     get_active_anode get_active_anode_inst (clk, active_anode);
-        
+    
+    // all rendering code goes in here
     wire [31:0] temp_seg;
     seg_renderer seg_renderer_inst (clk, mode, temp_seg);
         
-    always @(*) begin // TODO check whether the clock cycles line up
+    always @(*) begin
         case(active_anode)
             2'd0: begin
                 seg = temp_seg[7:0];

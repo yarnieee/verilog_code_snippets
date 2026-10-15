@@ -29,6 +29,7 @@ module seg_renderer(
     localparam LEFT_BOTTOM = 8'b1110_1111;
     localparam RIGHT_TOP = 8'b1111_1101;
     localparam RIGHT_BOTTOM = 8'b1111_1011;
+    localparam BLANK_ALL = ~32'b0;
 
     wire step_tick;
     slower_ticker #(24_999_999) seg_step_ticker (
@@ -36,16 +37,13 @@ module seg_renderer(
         .ticker(step_tick)
     );
 
+    // garbage
     wire [31:0] loop_seg_value;
     loop_seg loop_seg_inst (
-        .clk(clk),
-        .step_tick(step_tick),
-        .enable((mode == 3'd1) || (mode == 3'd2)),
-        .run(mode == 3'd1),
-        .rst(1'b0),
-        .all_seg(loop_seg_value)
+        
     );
 
+    // ROTATING EE2026--
     wire [31:0] rotate_text_value;
     rotate_text rotate_text_inst (
         .clk(clk),
