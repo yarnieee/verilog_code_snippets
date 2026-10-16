@@ -21,7 +21,12 @@ module control_seg(
     
     // all rendering code goes in here
     wire [31:0] temp_seg;
-    seg_renderer seg_renderer_inst (clk, mode, temp_seg);
+    seg_renderer seg_renderer_inst (
+        .clk(clk),
+        .mode(mode),
+        .reset(rst),
+        .all_seg(temp_seg)
+    );
         
     always @(*) begin
         case(active_anode)

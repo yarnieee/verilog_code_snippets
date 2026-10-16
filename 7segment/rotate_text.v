@@ -5,20 +5,22 @@
 // wire [31:0] rotate_text_value;
 // rotate_text rotate_text_inst (
 //     .clk(clk),
+//     .reset(reset),
 //     .seg(rotate_text_value)
 // )
 ////////////////
 
 module rotate_text(
     input clk,
+    input reset,
     output reg [31:0] seg = 0
     );
     
-    localparam E_VALUE = 8'b10000110;
+    localparam E_VALUE = 8'b1000_0110;
     localparam BLANK = 8'b1111_1111;
     localparam ZERO = 8'b1100_0000;
     localparam TWO = 8'b1010_0100;
-    localparam SIX = 8'b1000_0110;
+    localparam SIX = 8'b1000_0010;
 
     reg [31:0] temp;
 
@@ -38,7 +40,12 @@ module rotate_text(
     end
     
     always @(posedge clk_4Hz) begin
-        seg <= {seg[23:0], temp[31:24]};
-        temp = {temp[23:0], seg[31:24]};
+        if (reset) begin
+            seg <= {E_VALUE, E_VALUE, TWO, ZERO};
+            temp <= {TWO, SIX, BLANK, BLANK};
+        end else begin
+            seg <= {seg[23:0], temp[31:24]};
+            temp <= {temp[23:0], seg[31:24]};
+        end
     end
 endmodule

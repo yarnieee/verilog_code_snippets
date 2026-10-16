@@ -16,30 +16,19 @@ module control_oled (
         .ticker(step_tick)
     );
 
-    wire [6:0] circle_x;
-    wire [5:0] circle_y;
-    loop_oled loop_oled_inst (
-        .clk(clk),
-        .step_tick(step_tick),
-        .enable(mode == 3'd4),
-        .rst(rst),
-        .circle_x(circle_x),
-        .circle_y(circle_y)
-    );
-
-    wire [15:0] pixel_data;
-    
     //wire rst;
     wire frame_begin;
     wire sending_pixels;
     wire sample_pixel;
+    wire [15:0] pixel_data;
     wire [12:0] pixel_index; // 0 to 6143 for a 96x64 display
 
     oled_renderer oled_renderer_inst (
+        .clk(clk),
         .mode(mode),
         .pixel_index(pixel_index),
-        .circle_x(circle_x),
-        .circle_y(circle_y),
+        .step_tick(step_tick),
+        .rst(rst),
         .pixel_data(pixel_data)
     );
     

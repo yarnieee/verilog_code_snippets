@@ -3,22 +3,31 @@
 /////////////
 // instantiate via:
 //
-// wire [2:0] state;
+// wire [2:0] mode;
 // wire [12:0] pixel_index;
 // oled_renderer oled_renderer_inst (
+//     .clk(clk),
 //     .mode(mode),
 //     .pixel_index(pixel_index),
+//     .step_tick(step_tick),
+//     .rst(rst),
 //     .pixel_data(pixel_data)
 //     );
 /////////////
 
-// THIS IS THE BIG BOI TO CHANGE BASED ON STATE
-
+// Shape parameters are kept here so adding a shape does not require another
+// drawing submodule.  The packed layout is:
+// {width, height, x, y, x_offset, y_offset}
+//
+// For a rectangle, x/y is the top-left corner.  For a circle, x/y is the
+// centre and width/height are the horizontal/vertical radii.  Offsets are
+// signed two's-complement pixel offsets.
 module oled_renderer (
-    input wire [2:0]  mode,
+    input wire clk,
+    input wire [2:0] mode,
     input wire [12:0] pixel_index,
-    input wire [6:0]  circle_x,
-    input wire [5:0]  circle_y,
+    input wire step_tick,
+    input wire rst,
     output reg [15:0] pixel_data
 );
 
@@ -34,57 +43,86 @@ module oled_renderer (
     wire [6:0] pixel_x = pixel_index % 96;
     wire [5:0] pixel_y = pixel_index / 96;
 
-    wire rect_1;
-    rect #(
-        .X0(20), .Y0(10),
-        .WIDTH(20), .HEIGHT(40)
-    ) rect_inst (
-        .x(pixel_x),
-        .y(pixel_y),
-        .inside(rect_1)
+    // Extend every coordinate to 9-bit signed values before applying the
+    // signed offsets.  This also makes negative offsets behave naturally at
+    // the display boundary.
+    wire signed [8:0] pixel_x_signed = {2'b00, pixel_x};
+    wire signed [8:0] pixel_y_signed = {3'b000, pixel_y};
+
+    wire signed [7:0] x_offset;
+    wire signed [7:0] y_offset;
+
+    linear_offset #(
+        .X0(-64), .Y0(0),
+        .X1(0),   .Y1(0)
+    ) linear_offset_inst (
+        .clk(clk),
+        .step_tick(step_tick),
+        .enable(mode == 3'd4),
+        .rst(rst),
+        .x_offset(x_offset),
+        .y_offset(y_offset)
     );
 
-    wire circle_1;
-    circle #(
-        .CX(80), .CY(32),
-        .RADIUS(10)
-    ) circle_inst (
-        .x(pixel_x),
-        .y(pixel_y),
-        .inside(circle_1)
-    );
+    // CIRCLE
+    // params
+    wire [6:0] circle1_width = 7'd10;
+    wire [5:0] circle1_height = 6'd10;
+    wire [6:0] circle1_x = 7'd80;
+    wire [5:0] circle1_y = 6'd32;
+    wire signed [7:0] circle1_x_offset = ((mode == 3'd4) ? x_offset : 8'sd0);
+    wire signed [7:0] circle1_y_offset = ((mode == 3'd4) ? y_offset : 8'sd0);
 
-    // Dynamic circle used by loop_oled.  The widened intermediates prevent
-    // signed multiplication from truncating the distance calculation.
-    wire signed [8:0] moving_dx = $signed({1'b0, pixel_x}) - $signed({1'b0, circle_x});
-    wire signed [8:0] moving_dy = $signed({1'b0, pixel_y}) - $signed({1'b0, circle_y});
-    wire signed [17:0] moving_dx_wide = {{9{moving_dx[8]}}, moving_dx};
-    wire signed [17:0] moving_dy_wide = {{9{moving_dy[8]}}, moving_dy};
-    wire signed [17:0] moving_dx_squared = moving_dx_wide * moving_dx_wide;
-    wire signed [17:0] moving_dy_squared = moving_dy_wide * moving_dy_wide;
-    wire signed [18:0] moving_distance_squared = moving_dx_squared + moving_dy_squared;
-    wire moving_circle = moving_distance_squared <= 19'sd100;
+    wire signed [8:0] circle1_cx = {2'b00, circle1_x}
+                                  + {{1{circle1_x_offset[7]}}, circle1_x_offset};
+    wire signed [8:0] circle1_cy = {3'b000, circle1_y}
+                                  + {{1{circle1_y_offset[7]}}, circle1_y_offset};
+    wire signed [8:0] circle1_dx = pixel_x_signed - circle1_cx;
+    wire signed [8:0] circle1_dy = pixel_y_signed - circle1_cy;
+    //calculate dist from centre
+    wire signed [17:0] circle1_dx_squared = circle1_dx * circle1_dx;
+    wire signed [17:0] circle1_dy_squared = circle1_dy * circle1_dy;
+    wire signed [18:0] circle1_distance_squared = circle1_dx_squared + circle1_dy_squared;
+    wire signed [17:0] circle1_radius_squared = circle1_width * circle1_width;
+    //final check
+    wire in_circle1 = circle1_distance_squared <= circle1_radius_squared;
+
+
+    // RECT
+    // params
+    wire [6:0] rect1_width = 7'd20;
+    wire [5:0] rect1_height = 6'd40;
+    wire [6:0] rect1_x = 7'd20;
+    wire [5:0] rect1_y = 6'd10;
+    wire signed [7:0] rect1_x_offset = ((mode == 3'd4) ? x_offset : 8'sd0);
+    wire signed [7:0] rect1_y_offset = ((mode == 3'd4) ? y_offset : 8'sd0);
+
+    wire signed [8:0] rect1_left = {2'b00, rect1_x}
+                                   + {{1{rect1_x_offset[7]}}, rect1_x_offset};
+    wire signed [8:0] rect1_top = {3'b000, rect1_y}
+                                  + {{1{rect1_y_offset[7]}}, rect1_y_offset};
+    wire signed [8:0] rect1_right = rect1_left + rect1_width;
+    wire signed [8:0] rect1_bottom = rect1_top + rect1_height;
+    //final check
+    wire in_rect1 =
+        (pixel_x_signed >= rect1_left) && (pixel_x_signed < rect1_right) &&
+        (pixel_y_signed >= rect1_top) && (pixel_y_signed < rect1_bottom);
 
     always @(*) begin
         pixel_data = BLACK;
 
-        // Layer priority is determined by the order of these conditions.
-	    // lowest layer first
-
-        case(mode)
+        case (mode)
             3'd1: begin
-                if (rect_1) pixel_data = CYAN; //cyan
+                if (in_rect1) pixel_data = CYAN;
             end
 
-            3'd2: begin
-                if (circle_1) pixel_data = MAGENTA; //magenta
-            end
-
-            3'd4: begin
-                if (moving_circle) pixel_data = MAGENTA; //magenta
+            3'd2, 3'd4: begin
+                if (in_rect1) pixel_data = CYAN;
+                if (in_circle1) pixel_data = MAGENTA;
             end
 
             default: begin
+                pixel_data = BLACK;
             end
         endcase
     end

@@ -5,7 +5,8 @@
 module seg_renderer(
     input clk,
     input [2:0] mode,
-    output reg [31:0] all_seg = ~32'b0
+    input reset,
+    output reg [31:0] out_seg = ~32'b0
     );
 
     localparam BLANK = 8'b1111_1111;
@@ -15,7 +16,7 @@ module seg_renderer(
     localparam THREE = 8'b1011_0000;
     localparam FOUR = 8'b1001_1001;
     localparam FIVE = 8'b1011_0000;
-    localparam SIX = 8'b1000_0110;
+    localparam SIX = 8'b1000_0010;
     localparam SEVEN = 8'b1111_1000;
     localparam EIGHT = 8'b1000_0000;
     localparam NINE = 8'b1001_0000;
@@ -37,28 +38,36 @@ module seg_renderer(
         .ticker(step_tick)
     );
 
-    // garbage
     wire [31:0] loop_seg_value;
     loop_seg loop_seg_inst (
-        
+        .clk(clk),
+        .forward(1'b1),
+        .pause(1'b0),
+        .reset(reset),
+        .out_seg(loop_seg_value)
     );
 
     // ROTATING EE2026--
     wire [31:0] rotate_text_value;
     rotate_text rotate_text_inst (
         .clk(clk),
+        .reset(reset),
         .seg(rotate_text_value)
     );
 
     always @(*) begin
-        all_seg = ~32'b0;
+        out_seg = ~32'b0;
         case(mode)
             3'd0: begin
-                all_seg = rotate_text_value;
+                out_seg = rotate_text_value;
+            end
+
+            3'd1: begin
+                out_seg = loop_seg_value;
             end
 
             default: begin
-                all_seg = ~32'b0;
+                out_seg = BLANK_ALL;
             end
         endcase
     end

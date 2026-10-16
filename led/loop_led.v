@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+timescale 1ns / 1ps
 
 // A reusable 16-LED pendulum loop.
 //

@@ -6,6 +6,7 @@
 //     .clk(clk),
 //     .forward(1'b1),
 //     .pause(1'b0),
+//     .reset(reset),
 //     .out_seg(loop_seg_value)
 // );
 //////////
@@ -14,7 +15,8 @@ module loop_seg (
     input clk,
     input forward,
     input pause,
-    output reg [31:0] out_seg = {4{BLANK}}
+    input reset,
+    output reg [31:0] out_seg = ~32'b0
     );
 
     // to use these, (DOT & TOP_BAR & BOTTOM_BAR)
@@ -45,39 +47,39 @@ module loop_seg (
         case (state)
             0: begin
                 next_state = 1;
-                next_seg = BLANK_ALL & (DOT << 8);
+                next_seg = {BLANK, BLANK, DOT, BLANK};
                 end
             1: begin
                 next_state = 2;
-                next_seg = BLANK_ALL & (RIGHT_BOTTOM << 8);
+                next_seg = {BLANK, BLANK, RIGHT_BOTTOM, BLANK};
                 end
             2: begin
                 next_state = 3;
-                next_seg = BLANK_ALL & (MIDDLE_BAR << 8);
+                next_seg = {BLANK, BLANK, MIDDLE_BAR, BLANK};
                 end
             3: begin
                 next_state = 4;
-                next_seg = BLANK_ALL & (MIDDLE_BAR << 16);
+                next_seg = {BLANK, MIDDLE_BAR, BLANK, BLANK};
                 end
             4: begin
                 next_state = 5;
-                next_seg = BLANK_ALL & (MIDDLE_BAR << 24);
+                next_seg = {MIDDLE_BAR, BLANK, BLANK, BLANK};
                 end
             5: begin
                 next_state = 6;
-                next_seg = BLANK_ALL & (LEFT_BOTTOM << 24);
+                next_seg = {LEFT_BOTTOM, BLANK, BLANK, BLANK};
                 end
             6: begin
                 next_state = 7;
-                next_seg = BLANK_ALL & (BOTTOM_BAR << 24);
+                next_seg = {BOTTOM_BAR, BLANK, BLANK, BLANK};
                 end
             7: begin
                 next_state = 8;
-                next_seg = BLANK_ALL & (BOTTOM_BAR << 16);
+                next_seg = {BLANK, BOTTOM_BAR, BLANK, BLANK};
                 end
             8: begin
                 next_state = 0;
-                next_seg = BLANK_ALL & (BOTTOM_BAR << 8);
+                next_seg = {BLANK, BLANK, BOTTOM_BAR, BLANK};
                 end
             default: begin
                 next_state = 0;
@@ -87,8 +89,13 @@ module loop_seg (
     end
 
     always @(posedge out_clk) begin
-        out_seg <= next_seg;
-        state <= next_state;
+        if (reset) begin
+            out_seg <= BLANK_ALL;
+            state <= 0;
+        end else begin
+            out_seg <= next_seg;
+            state <= next_state;
+        end
     end
 
 endmodule
