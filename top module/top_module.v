@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 
+//the one ring to rule them all
 module top_module(
     input clk,
     input [4:0] btn,
@@ -24,6 +25,6 @@ module top_module(
 
     led_mode_switcher led_mode_switcher_inst (clk, mode, rst, led);
     control_seg control_seg_inst (clk, mode, rst, an, seg);
-    control_oled control_oled_inst (clk, mode, rst, JB); //CHANGE
+    control_oled control_oled_inst (clk, mode, rst, JB); //CHANGE JB
 
 endmodule
