@@ -6,7 +6,8 @@ module seg_renderer(
     input clk,
     input [2:0] mode,
     input reset,
-    output reg [31:0] out_seg = ~32'b0
+    output reg [31:0] out_seg = ~32'b0,
+    output segments_done
     );
 
     localparam BLANK = 8'b1111_1111;
@@ -32,37 +33,25 @@ module seg_renderer(
     localparam RIGHT_BOTTOM = 8'b1111_1011;
     localparam BLANK_ALL = ~32'b0;
 
-    wire step_tick;
-    slower_ticker #(24_999_999) seg_step_ticker (
-        .clk(clk),
-        .ticker(step_tick)
-    );
-
+    //not even a loop.
+    wire seg_rst;
+    assign seg_rst = (mode == 3'd5);
     wire [31:0] loop_seg_value;
     loop_seg loop_seg_inst (
         .clk(clk),
-        .forward(1'b1),
-        .pause(1'b0),
-        .reset(reset),
-        .out_seg(loop_seg_value)
-    );
-
-    // ROTATING EE2026--
-    wire [31:0] rotate_text_value;
-    rotate_text rotate_text_inst (
-        .clk(clk),
-        .reset(reset),
-        .seg(rotate_text_value)
+        .reset(seg_rst),
+        .out_seg(loop_seg_value),
+        .segments_done(segments_done)
     );
 
     always @(*) begin
-        out_seg = ~32'b0;
+        out_seg = BLANK_ALL;
         case(mode)
-            3'd0: begin
-                out_seg = rotate_text_value;
+            3'd0, 3'd1, 3'd2, 3'd3, 3'd4: begin
+                out_seg = {BLANK, TOP_BAR, BLANK, BLANK};
             end
 
-            3'd1: begin
+            3'd5, 3'd6: begin
                 out_seg = loop_seg_value;
             end
 

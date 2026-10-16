@@ -4,7 +4,7 @@ module control_oled (
     input clk,
     input [2:0] mode,
     input rst, //currently, reset is the centre button
-    output [7:0] JB
+    output [7:0] JX
     );
 
     wire clk_6_25MHz; //
@@ -33,13 +33,13 @@ module control_oled (
         .sending_pixels(sending_pixels),
         .sample_pixel(sample_pixel),
         .pixel_index(pixel_index),
-        .cs(JB[0]),
-        .sdin(JB[1]),
-        .sclk(JB[3]),
-        .d_cn(JB[4]),
-        .resn(JB[5]),
-        .vccen(JB[6]),
-        .pmoden(JB[7])
+        .cs(JX[0]),
+        .sdin(JX[1]),
+        .sclk(JX[3]),
+        .d_cn(JX[4]),
+        .resn(JX[5]),
+        .vccen(JX[6]),
+        .pmoden(JX[7])
     );
 
 endmodule

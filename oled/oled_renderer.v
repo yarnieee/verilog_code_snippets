@@ -42,82 +42,37 @@ module oled_renderer (
     wire [6:0] pixel_x = pixel_index % 96;
     wire [5:0] pixel_y = pixel_index / 96;
 
-    // Extend every coordinate to 9-bit signed values before applying the
-    // signed offsets.  This also makes negative offsets behave naturally at
-    // the display boundary.
-    wire signed [8:0] pixel_x_signed = {2'b00, pixel_x};
-    wire signed [8:0] pixel_y_signed = {3'b000, pixel_y};
-
-    wire signed [7:0] x_offset;
-    wire signed [7:0] y_offset;
-
-    linear_offset #(
-        .X0(-64), .Y0(0),
-        .X1(0),   .Y1(0),
-        .step_tick(4_999_999)
-    ) linear_offset_inst (
+    wire out_clk;
+    slower_clk #(.MAX_COUNT(5_555_555)) slower_clk_inst (
         .clk(clk),
-        .enable(mode == 3'd4),
-        .rst(rst),
-        .x_offset(x_offset),
-        .y_offset(y_offset)
-    );
+        .out_clk(out_clk)
+        );
+    
+    wire [6:0] centre_x = 48;
+    wire [5:0] centre_y = 32;
+    reg [6:0] rect_x = 3;
+    reg [5:0] rect_y = 3;
+    wire [6:0] x_max = 31;
+    wire [5:0] y_max = 31;
+    wire in_rect;
+    assign in_rect = (pixel_x >= (centre_x-rect_x)) && (pixel_x <= (centre_x+rect_x)) &&
+        (pixel_y >= (centre_y-rect_y)) && (pixel_y <= (centre_y+rect_y));
+    
+    always @(posedge out_clk) begin
+        if (mode==3'd5 && (rect_y < y_max)) begin
+            rect_y <= rect_y + 1;
+        end else if (mode==3'd6 && (rect_x < x_max)) begin
+            rect_x <= rect_x + 1;
+        end
+    end
 
-    // CIRCLE
-    // params
-    wire [6:0] circle1_width = 7'd10;
-    wire [5:0] circle1_height = 6'd10;
-    wire [6:0] circle1_x = 7'd80;
-    wire [5:0] circle1_y = 6'd32;
-    wire signed [7:0] circle1_x_offset = ((mode == 3'd4) ? x_offset : 8'sd0);
-    wire signed [7:0] circle1_y_offset = ((mode == 3'd4) ? y_offset : 8'sd0);
-
-    wire signed [8:0] circle1_cx = {2'b00, circle1_x}
-                                  + {{1{circle1_x_offset[7]}}, circle1_x_offset};
-    wire signed [8:0] circle1_cy = {3'b000, circle1_y}
-                                  + {{1{circle1_y_offset[7]}}, circle1_y_offset};
-    wire signed [8:0] circle1_dx = pixel_x_signed - circle1_cx;
-    wire signed [8:0] circle1_dy = pixel_y_signed - circle1_cy;
-    //calculate dist from centre
-    wire signed [17:0] circle1_dx_squared = circle1_dx * circle1_dx;
-    wire signed [17:0] circle1_dy_squared = circle1_dy * circle1_dy;
-    wire signed [18:0] circle1_distance_squared = circle1_dx_squared + circle1_dy_squared;
-    wire signed [17:0] circle1_radius_squared = circle1_width * circle1_width;
-    //final check
-    wire in_circle1 = circle1_distance_squared <= circle1_radius_squared;
-
-
-    // RECT
-    // params
-    wire [6:0] rect1_width = 7'd20;
-    wire [5:0] rect1_height = 6'd40;
-    wire [6:0] rect1_x = 7'd20;
-    wire [5:0] rect1_y = 6'd10;
-    wire signed [7:0] rect1_x_offset = ((mode == 3'd4) ? x_offset : 8'sd0);
-    wire signed [7:0] rect1_y_offset = ((mode == 3'd4) ? y_offset : 8'sd0);
-
-    wire signed [8:0] rect1_left = {2'b00, rect1_x}
-                                   + {{1{rect1_x_offset[7]}}, rect1_x_offset};
-    wire signed [8:0] rect1_top = {3'b000, rect1_y}
-                                  + {{1{rect1_y_offset[7]}}, rect1_y_offset};
-    wire signed [8:0] rect1_right = rect1_left + rect1_width;
-    wire signed [8:0] rect1_bottom = rect1_top + rect1_height;
-    //final check
-    wire in_rect1 =
-        (pixel_x_signed >= rect1_left) && (pixel_x_signed < rect1_right) &&
-        (pixel_y_signed >= rect1_top) && (pixel_y_signed < rect1_bottom);
-
-    always @(*) begin
+    always @(*) begin        
         pixel_data = BLACK;
-
+        
         case (mode)
-            3'd1: begin
-                if (in_rect1) pixel_data = CYAN;
-            end
-
-            3'd2, 3'd4: begin
-                if (in_rect1) pixel_data = CYAN;
-                if (in_circle1) pixel_data = MAGENTA;
+            3'd5,3'd6: begin
+                pixel_data = BLUE;
+                if (in_rect) pixel_data = YELLOW;
             end
 
             default: begin

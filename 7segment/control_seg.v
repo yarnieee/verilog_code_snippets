@@ -13,7 +13,8 @@ module control_seg(
     input [2:0] mode,
     input rst,
     output reg [3:0] an = ~4'b0,
-    output reg [7:0] seg = ~8'b0
+    output reg [7:0] seg = ~8'b0,
+    output segments_done
     );
         
     wire [1:0] active_anode;
@@ -25,7 +26,8 @@ module control_seg(
         .clk(clk),
         .mode(mode),
         .reset(rst),
-        .all_seg(temp_seg)
+        .out_seg(temp_seg),
+        .segments_done(segments_done)
     );
         
     always @(*) begin
