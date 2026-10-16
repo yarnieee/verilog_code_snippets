@@ -10,7 +10,7 @@ module get_active_anode(
     );
     
     wire slow_clk;
-    slower_ticker #(9_999) ticker_1kHz (clk, slow_clk);
+    slower_ticker #(99_999) ticker_1kHz (clk, slow_clk);
     
     always @(posedge slow_clk) begin
         active_anode <= (active_anode==3) ? 0 : active_anode + 1;
