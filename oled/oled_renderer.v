@@ -26,7 +26,6 @@ module oled_renderer (
     input wire clk,
     input wire [2:0] mode,
     input wire [12:0] pixel_index,
-    input wire step_tick,
     input wire rst,
     output reg [15:0] pixel_data
 );
@@ -54,10 +53,10 @@ module oled_renderer (
 
     linear_offset #(
         .X0(-64), .Y0(0),
-        .X1(0),   .Y1(0)
+        .X1(0),   .Y1(0),
+        .step_tick(4_999_999)
     ) linear_offset_inst (
         .clk(clk),
-        .step_tick(step_tick),
         .enable(mode == 3'd4),
         .rst(rst),
         .x_offset(x_offset),

@@ -22,7 +22,8 @@ module linear_offset #(
     parameter integer X0 = 0,
     parameter integer Y0 = 0,
     parameter integer X1 = 0,
-    parameter integer Y1 = 0
+    parameter integer Y1 = 0,
+    parameter step_tick = 4_999_999
     )(
     input wire clk,
     input wire step_tick,
@@ -33,6 +34,12 @@ module linear_offset #(
     );
 
     reg forward = 1'b1;
+
+    wire step_tick;
+    slower_ticker #(4_999_999) oled_step_ticker (
+        .clk(clk),
+        .ticker(step_tick)
+    );
 
     always @(posedge clk) begin
         if (rst || !enable) begin
