@@ -2,7 +2,7 @@
 
 // THIS IS THE BIG BOI TO CHANGE BASED ON STATE
 
-module seg_renderer(
+module seg_mode_switcher(
     input clk,
     input [2:0] mode,
     input reset,

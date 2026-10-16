@@ -17,7 +17,7 @@ module control_oled (
     wire [15:0] pixel_data;
     wire [12:0] pixel_index; // 0 to 6143 for a 96x64 display
 
-    oled_renderer oled_renderer_inst (
+    oled_mode_switcher oled_mode_switcher_inst (
         .clk(clk),
         .mode(mode),
         .pixel_index(pixel_index),

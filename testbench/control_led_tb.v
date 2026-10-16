@@ -1,12 +1,12 @@
 `timescale 1ns / 1ps
 
-module control_led_tb;
+module led_mode_switcher_tb;
     reg clk;
     reg [2:0] mode;
     reg rst;
     wire [15:0] led;
 
-    control_led dut (
+    led_mode_switcher dut (
         .clk(clk),
         .mode(mode),
         .rst(rst),
@@ -21,7 +21,7 @@ module control_led_tb;
         begin
             #1;
             if (led !== expected) begin
-                $display("FAIL control_led: expected %h, got %h at %0t", expected, led, $time);
+                $display("FAIL led_mode_switcher: expected %h, got %h at %0t", expected, led, $time);
                 $finish;
             end
         end
@@ -61,7 +61,7 @@ module control_led_tb;
         expect_led(16'h0001);
 
         release dut.step_tick;
-        $display("PASS control_led_tb");
+        $display("PASS led_mode_switcher_tb");
         $finish;
     end
 endmodule

@@ -21,12 +21,12 @@ module control_oled_tb;
         input [5:0] expected_y;
         begin
             #1;
-            if ((dut.oled_renderer_inst.circle1_cx !== expected_x) ||
-                (dut.oled_renderer_inst.circle1_cy !== expected_y)) begin
+            if ((dut.oled_mode_switcher_inst.circle1_cx !== expected_x) ||
+                (dut.oled_mode_switcher_inst.circle1_cy !== expected_y)) begin
                 $display("FAIL control_oled: expected center (%0d,%0d), got (%0d,%0d) at %0t",
                     expected_x, expected_y,
-                    dut.oled_renderer_inst.circle1_cx,
-                    dut.oled_renderer_inst.circle1_cy,
+                    dut.oled_mode_switcher_inst.circle1_cx,
+                    dut.oled_mode_switcher_inst.circle1_cy,
                     $time);
                 $finish;
             end

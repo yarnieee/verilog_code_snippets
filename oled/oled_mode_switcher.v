@@ -5,7 +5,7 @@
 //
 // wire [2:0] mode;
 // wire [12:0] pixel_index;
-// oled_renderer oled_renderer_inst (
+// oled_mode_switcher oled_mode_switcher_inst (
 //     .clk(clk),
 //     .mode(mode),
 //     .pixel_index(pixel_index),
@@ -22,7 +22,7 @@
 // For a rectangle, x/y is the top-left corner.  For a circle, x/y is the
 // centre and width/height are the horizontal/vertical radii.  Offsets are
 // signed two's-complement pixel offsets.
-module oled_renderer (
+module oled_mode_switcher (
     input wire clk,
     input wire [2:0] mode,
     input wire [12:0] pixel_index,

@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module control_led(
+module led_mode_switcher(
     input clk,
     input [2:0] mode,
     input rst,

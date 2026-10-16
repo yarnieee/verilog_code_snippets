@@ -22,9 +22,9 @@ module control_seg_tb;
         input [31:0] expected;
         begin
             #1;
-            if (dut.seg_renderer_inst.all_seg !== expected) begin
+            if (dut.seg_mode_switcher_inst.all_seg !== expected) begin
                 $display("FAIL control_seg: expected renderer %h, got %h at %0t",
-                    expected, dut.seg_renderer_inst.all_seg, $time);
+                    expected, dut.seg_mode_switcher_inst.all_seg, $time);
                 $finish;
             end
         end
@@ -34,7 +34,7 @@ module control_seg_tb;
         rst = 1'b0;
         mode = 3'd0;
         force dut.get_active_anode_inst.active_anode = 2'd0;
-        force dut.seg_renderer_inst.step_tick = 1'b0;
+        force dut.seg_mode_switcher_inst.step_tick = 1'b0;
         @(posedge clk);
         expect_renderer(32'hffff_ffff);
 
@@ -43,7 +43,7 @@ module control_seg_tb;
         expect_renderer(32'hffff_ff80);
 
         // The glyph advances one digit when the template is ticked.
-        force dut.seg_renderer_inst.step_tick = 1'b1;
+        force dut.seg_mode_switcher_inst.step_tick = 1'b1;
         @(posedge clk);
         expect_renderer(32'hffff_80ff);
 
@@ -57,7 +57,7 @@ module control_seg_tb;
         @(posedge clk);
         expect_renderer(32'hffff_ffff);
 
-        release dut.seg_renderer_inst.step_tick;
+        release dut.seg_mode_switcher_inst.step_tick;
         release dut.get_active_anode_inst.active_anode;
         $display("PASS control_seg_tb");
         $finish;
