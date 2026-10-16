@@ -63,61 +63,12 @@ module oled_renderer (
         .y_offset(y_offset)
     );
 
-    // CIRCLE
-    // params
-    wire [6:0] circle1_width = 7'd10;
-    wire [5:0] circle1_height = 6'd10;
-    wire [6:0] circle1_x = 7'd80;
-    wire [5:0] circle1_y = 6'd32;
-    wire signed [7:0] circle1_x_offset = ((mode == 3'd4) ? x_offset : 8'sd0);
-    wire signed [7:0] circle1_y_offset = ((mode == 3'd4) ? y_offset : 8'sd0);
-
-    wire signed [8:0] circle1_cx = {2'b00, circle1_x}
-                                  + {{1{circle1_x_offset[7]}}, circle1_x_offset};
-    wire signed [8:0] circle1_cy = {3'b000, circle1_y}
-                                  + {{1{circle1_y_offset[7]}}, circle1_y_offset};
-    wire signed [8:0] circle1_dx = pixel_x_signed - circle1_cx;
-    wire signed [8:0] circle1_dy = pixel_y_signed - circle1_cy;
-    //calculate dist from centre
-    wire signed [17:0] circle1_dx_squared = circle1_dx * circle1_dx;
-    wire signed [17:0] circle1_dy_squared = circle1_dy * circle1_dy;
-    wire signed [18:0] circle1_distance_squared = circle1_dx_squared + circle1_dy_squared;
-    wire signed [17:0] circle1_radius_squared = circle1_width * circle1_width;
-    //final check
-    wire in_circle1 = circle1_distance_squared <= circle1_radius_squared;
-
-
-    // RECT
-    // params
-    wire [6:0] rect1_width = 7'd20;
-    wire [5:0] rect1_height = 6'd40;
-    wire [6:0] rect1_x = 7'd20;
-    wire [5:0] rect1_y = 6'd10;
-    wire signed [7:0] rect1_x_offset = ((mode == 3'd4) ? x_offset : 8'sd0);
-    wire signed [7:0] rect1_y_offset = ((mode == 3'd4) ? y_offset : 8'sd0);
-
-    wire signed [8:0] rect1_left = {2'b00, rect1_x}
-                                   + {{1{rect1_x_offset[7]}}, rect1_x_offset};
-    wire signed [8:0] rect1_top = {3'b000, rect1_y}
-                                  + {{1{rect1_y_offset[7]}}, rect1_y_offset};
-    wire signed [8:0] rect1_right = rect1_left + rect1_width;
-    wire signed [8:0] rect1_bottom = rect1_top + rect1_height;
-    //final check
-    wire in_rect1 =
-        (pixel_x_signed >= rect1_left) && (pixel_x_signed < rect1_right) &&
-        (pixel_y_signed >= rect1_top) && (pixel_y_signed < rect1_bottom);
-
     always @(*) begin
         pixel_data = BLACK;
 
         case (mode)
             3'd1: begin
-                if (in_rect1) pixel_data = CYAN;
-            end
-
-            3'd2, 3'd4: begin
-                if (in_rect1) pixel_data = CYAN;
-                if (in_circle1) pixel_data = MAGENTA;
+                pixel_data = BLUE;
             end
 
             default: begin
