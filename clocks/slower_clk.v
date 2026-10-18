@@ -11,10 +11,10 @@
 
 module slower_clk #(
     parameter MAX_COUNT = 9_999
-    )(
+)(
     input clk,
     output reg out_clk = 0
-    );
+);
 
     reg [31:0] counter = 0;
     
