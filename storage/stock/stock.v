@@ -13,7 +13,7 @@
 module stock #(
     parameter integer BUFFER_DEPTH = 180,
     parameter integer VOLATILITY = 10,
-    parameter SEED_FILE = "AMD_seed.mem"
+    parameter SEED_FILE = "storage/data/AMD_seed.mem"
     )(
     input wire                          clk,
     input wire                          rst,

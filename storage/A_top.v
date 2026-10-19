@@ -138,7 +138,7 @@ module A_top #(
     stock #(
         .BUFFER_DEPTH(BUFFER_DEPTH),
         .VOLATILITY(AMD_VOLATILITY),
-        .SEED_FILE("storage/AMD_seed.mem")
+        .SEED_FILE("storage/data/AMD_seed.mem")
         ) amd_stock_inst (
         .clk(clk),
         .rst(rst),
@@ -157,7 +157,7 @@ module A_top #(
     stock #(
         .BUFFER_DEPTH(BUFFER_DEPTH),
         .VOLATILITY(MCD_VOLATILITY),
-        .SEED_FILE("storage/MCD_seed.mem")
+        .SEED_FILE("storage/data/MCD_seed.mem")
         ) mcd_stock_inst (
         .clk(clk),
         .rst(rst),
