@@ -11,7 +11,7 @@
 // bear shifts the random value upward, bull shifts it downward, and crash
 // applies a larger bearish shift.  Normal leaves the random value unchanged.
 module stock #(
-    parameter integer BUFFER_DEPTH = 1800,
+    parameter integer BUFFER_DEPTH = 180,
     parameter integer VOLATILITY = 10,
     parameter SEED_FILE = "AMD_seed.mem"
     )(

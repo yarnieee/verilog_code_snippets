@@ -1,5 +1,5 @@
 param(
-    [int]$Depth = 1800
+    [int]$Depth = 180
 )
 
 # Convert the latest CSV records into fixed-width memories for $readmemh.

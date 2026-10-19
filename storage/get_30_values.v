@@ -8,7 +8,7 @@
 // output is the integer mean of its subsection.
 module get_30_values #(
     parameter integer WINDOW = 30,
-    parameter integer TOTAL_DEPTH = 1800,
+    parameter integer TOTAL_DEPTH = 180,
     parameter integer WIDTH = 16,
     parameter integer SAMPLE_COUNT = 30
     )(
