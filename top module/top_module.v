@@ -20,8 +20,8 @@ module top_module(
     // get_mode get_mode_inst (clk, btn, sw, rst, mode, led_12); //led_12 as input
     // led_mode_switcher led_mode_switcher_inst (clk, mode, rst, led, led_12); //led_12 as output
 
-    //get_mode get_mode_inst (clk, btn, sw, rst, mode);
-    test_mode test_mode_inst (clk, btn, sw, rst, mode);
+    get_mode get_mode_inst (clk, btn, sw, rst, mode);
+    // test_mode test_mode_inst (clk, btn, sw, rst, mode);
 
     led_mode_switcher led_mode_switcher_inst (clk, mode, rst, led);
     control_seg control_seg_inst (clk, mode, rst, an, seg);
